@@ -109,32 +109,35 @@ def dashboard():
     conexion = sqlite3.connect("database.db")
     cursor = conexion.cursor()
 
-    # Logs
+    # Obtener backups
+    cursor.execute("""
+        SELECT id, nombre, fecha, estado
+        FROM backups
+        ORDER BY id DESC
+        LIMIT 10
+    """)
+
+    datos_backups = cursor.fetchall()
+
+    backups = []
+
+    for fila in datos_backups:
+        backups.append({
+            "id": fila[0],
+            "nombre": fila[1],
+            "fecha": fila[2],
+            "estado": fila[3]
+        })
+
+    # Obtener logs
     cursor.execute("""
         SELECT usuario, evento, fecha
         FROM logs
         ORDER BY id DESC
         LIMIT 10
     """)
+
     logs = cursor.fetchall()
-
-    # Backups desde base de datos
-    cursor.execute("""
-        SELECT nombre, fecha, estado
-        FROM backups
-        ORDER BY id DESC
-    """)
-
-    datos = cursor.fetchall()
-
-    backups = []
-
-    for fila in datos:
-        backups.append({
-            "nombre": fila[0],
-            "fecha": fila[1],
-            "estado": fila[2]
-        })
 
     conexion.close()
 
@@ -171,6 +174,25 @@ def crear_backup():
     conexion.close()
 
     registrar_log(session["usuario"], "Backup creado")
+
+    return redirect(url_for("dashboard"))
+
+
+@app.route("/eliminar_backup/<int:id>")
+def eliminar_backup(id):
+
+    if "usuario" not in session:
+        return redirect(url_for("login"))
+
+    conexion = sqlite3.connect("database.db")
+    cursor = conexion.cursor()
+
+    cursor.execute("DELETE FROM backups WHERE id=?", (id,))
+
+    conexion.commit()
+    conexion.close()
+
+    registrar_log(session["usuario"], f"Backup eliminado ID {id}")
 
     return redirect(url_for("dashboard"))
 

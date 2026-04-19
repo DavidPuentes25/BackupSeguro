@@ -55,6 +55,7 @@ a{
     <th>Nombre Backup</th>
     <th>Fecha</th>
     <th>Estado</th>
+    <th>Acción</th>
 </tr>
 
 {% for backup in backups %}
@@ -62,6 +63,9 @@ a{
     <td>{{backup.nombre}}</td>
     <td>{{backup.fecha}}</td>
     <td>{{backup.estado}}</td>
+    <td>
+<a href="/eliminar_backup/{{backup.id}}">Eliminar</a>
+</td>
 </tr>
 {% endfor %}
 </table>
