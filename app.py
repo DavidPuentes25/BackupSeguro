@@ -196,6 +196,40 @@ def eliminar_backup(id):
 
     return redirect(url_for("dashboard"))
 
+@app.route("/nuevo_usuario", methods=["GET", "POST"])
+def nuevo_usuario():
+
+    if "usuario" not in session:
+        return redirect(url_for("login"))
+
+    mensaje = ""
+
+    if request.method == "POST":
+
+        usuario_nuevo = request.form["usuario"]
+        password_nuevo = request.form["password"]
+
+        try:
+            conexion = sqlite3.connect("database.db")
+            cursor = conexion.cursor()
+
+            cursor.execute(
+                "INSERT INTO usuarios (usuario, password) VALUES (?, ?)",
+                (usuario_nuevo, password_nuevo)
+            )
+
+            conexion.commit()
+            conexion.close()
+
+            registrar_log(session["usuario"], f"Creó usuario {usuario_nuevo}")
+
+            mensaje = "Usuario creado correctamente"
+
+        except:
+            mensaje = "Ese usuario ya existe"
+
+    return render_template("nuevo_usuario.html", mensaje=mensaje)
+
 if __name__ == "__main__":
     print("Servidor iniciando...")
     app.run(debug=True, host="127.0.0.1", port=5000)

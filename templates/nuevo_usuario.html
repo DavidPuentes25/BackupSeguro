@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Nuevo Usuario</title>
+
+<style>
+body{
+    font-family:Arial;
+    background:#f4f6f7;
+    margin:40px;
+}
+
+form{
+    background:white;
+    padding:30px;
+    width:300px;
+    border-radius:10px;
+}
+
+input{
+    width:100%;
+    padding:10px;
+    margin:10px 0;
+}
+
+button,a{
+    padding:10px 20px;
+    text-decoration:none;
+}
+</style>
+
+</head>
+<body>
+
+<h1>Crear Nuevo Usuario</h1>
+
+<form method="POST">
+
+<input type="text" name="usuario" placeholder="Usuario" required>
+<input type="password" name="password" placeholder="Contraseña" required>
+
+<button type="submit">Crear</button>
+
+</form>
+
+<p>{{mensaje}}</p>
+
+<br>
+<a href="/dashboard">Volver</a>
+
+</body>
+</html>
