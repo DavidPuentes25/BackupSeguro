@@ -50,7 +50,9 @@ def login():
             registrar_log(usuario, "Login correcto")
 
             session.clear()
+
             session["usuario_temp"] = usuario
+            session["rol_temp"] = user[3]
 
             return redirect("/verify")
 
@@ -59,7 +61,6 @@ def login():
             mensaje = "Credenciales incorrectas"
 
     return render_template("login.html", mensaje=mensaje)
-
 
 @app.route("/verify", methods=["GET", "POST"])
 def verify():
@@ -78,7 +79,10 @@ def verify():
             registrar_log(session["usuario_temp"], "2FA correcto")
 
             session["usuario"] = session["usuario_temp"]
+            session["rol"] = session["rol_temp"]
+
             session.pop("usuario_temp", None)
+            session.pop("rol_temp", None)
 
             return redirect(url_for("dashboard"))
 
@@ -144,6 +148,7 @@ def dashboard():
     return render_template(
         "dashboard.html",
         usuario=session["usuario"],
+        rol=session["rol"],
         backups=backups,
         logs=logs
     )

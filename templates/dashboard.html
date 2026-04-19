@@ -39,6 +39,15 @@ a{
     background:#e74c3c;
     color:white;
     border-radius:5px;
+    display:inline-block;
+    margin:5px;
+}
+
+.info{
+    background:white;
+    padding:15px;
+    border-radius:8px;
+    margin-bottom:20px;
 }
 </style>
 
@@ -46,7 +55,11 @@ a{
 <body>
 
 <h1>Bienvenido {{usuario}}</h1>
+
+<div class="info">
+<p><strong>Rol actual:</strong> [{{rol}}]</p>
 <p>Sistema Seguro de Backups Institucional</p>
+</div>
 
 <h2>Backups Registrados</h2>
 
@@ -64,8 +77,14 @@ a{
     <td>{{backup.fecha}}</td>
     <td>{{backup.estado}}</td>
     <td>
-<a href="/eliminar_backup/{{backup.id}}">Eliminar</a>
-</td>
+
+        {% if rol|trim|lower == "admin" %}
+        <a href="/eliminar_backup/{{backup.id}}">Eliminar</a>
+        {% else %}
+        Sin permiso
+        {% endif %}
+
+    </td>
 </tr>
 {% endfor %}
 </table>
@@ -88,12 +107,13 @@ a{
 {% endfor %}
 </table>
 
+{% if rol|trim|lower == "admin" or rol|trim|lower == "operador" %}
 <a href="/crear_backup">Crear Backup</a>
-<br><br>
-<br><br>
+{% endif %}
 
+{% if rol|trim|lower == "admin" %}
 <a href="/nuevo_usuario">Nuevo Usuario</a>
-<br><br>
+{% endif %}
 
 <a href="/logout">Cerrar Sesión</a>
 

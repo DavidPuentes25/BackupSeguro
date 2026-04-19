@@ -3,26 +3,17 @@ import sqlite3
 conexion = sqlite3.connect("database.db")
 cursor = conexion.cursor()
 
-# Tabla usuarios
+# Usuarios
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS usuarios (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     usuario TEXT UNIQUE,
-    password TEXT
+    password TEXT,
+    rol TEXT
 )
 """)
 
-# Tabla backups
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS backups (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    nombre TEXT,
-    fecha TEXT,
-    estado TEXT
-)
-""")
-
-# Tabla logs
+# Logs
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS logs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -32,18 +23,20 @@ CREATE TABLE IF NOT EXISTS logs (
 )
 """)
 
-# Usuario admin
+# Backups
 cursor.execute("""
-INSERT OR IGNORE INTO usuarios (usuario, password)
-VALUES ('admin', '1234')
+CREATE TABLE IF NOT EXISTS backups (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nombre TEXT,
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    estado TEXT
+)
 """)
 
+# Usuario admin
 cursor.execute("""
-INSERT OR IGNORE INTO backups (id, nombre, fecha, estado)
-VALUES
-(1,'Backup_Academico.zip','2026-04-16','Correcto'),
-(2,'Backup_Finanzas.zip','2026-04-15','Correcto'),
-(3,'Backup_Investigacion.zip','2026-04-14','Pendiente')
+INSERT INTO usuarios (usuario, password, rol)
+VALUES ('admin', '1234', 'admin')
 """)
 
 conexion.commit()
