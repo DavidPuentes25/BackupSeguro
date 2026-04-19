@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Panel de Backups</title>
+
+<style>
+body{
+    font-family:Arial;
+    background:#f4f6f7;
+    margin:40px;
+}
+
+h1,h2{
+    color:#2c3e50;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+    margin-bottom:30px;
+}
+
+th,td{
+    padding:12px;
+    border:1px solid #ddd;
+    text-align:center;
+}
+
+th{
+    background:#2c3e50;
+    color:white;
+}
+
+a{
+    text-decoration:none;
+    padding:10px 20px;
+    background:#e74c3c;
+    color:white;
+    border-radius:5px;
+}
+</style>
+
+</head>
+<body>
+
+<h1>Bienvenido {{usuario}}</h1>
+<p>Sistema Seguro de Backups Institucional</p>
+
+<h2>Backups Registrados</h2>
+
+<table>
+<tr>
+    <th>Nombre Backup</th>
+    <th>Fecha</th>
+    <th>Estado</th>
+</tr>
+
+{% for backup in backups %}
+<tr>
+    <td>{{backup.nombre}}</td>
+    <td>{{backup.fecha}}</td>
+    <td>{{backup.estado}}</td>
+</tr>
+{% endfor %}
+</table>
+
+<h2>Logs de Seguridad</h2>
+
+<table>
+<tr>
+    <th>Usuario</th>
+    <th>Evento</th>
+    <th>Fecha</th>
+</tr>
+
+{% for log in logs %}
+<tr>
+    <td>{{log[0]}}</td>
+    <td>{{log[1]}}</td>
+    <td>{{log[2]}}</td>
+</tr>
+{% endfor %}
+</table>
+
+<a href="/crear_backup">Crear Backup</a>
+<br><br>
+<br><br>
+
+<a href="/logout">Cerrar Sesión</a>
+
+</body>
+</html>

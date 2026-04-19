@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Login Seguro</title>
+<style>
+body{
+    font-family: Arial;
+    background:#f4f4f4;
+    text-align:center;
+    margin-top:100px;
+}
+form{
+    background:white;
+    padding:30px;
+    display:inline-block;
+    border-radius:10px;
+}
+input{
+    padding:10px;
+    margin:10px;
+    width:200px;
+}
+button{
+    padding:10px 20px;
+    background:#2c3e50;
+    color:white;
+    border:none;
+}
+p{
+    color:red;
+}
+</style>
+</head>
+<body>
+
+<h2>Sistema Seguro de Backups</h2>
+
+<form method="POST">
+    <input type="text" name="usuario" placeholder="Usuario" required><br>
+    <input type="password" name="password" placeholder="Contraseña" required><br>
+    <button type="submit">Ingresar</button>
+    <p>{{mensaje}}</p>
+</form>
+
+</body>
+</html>
