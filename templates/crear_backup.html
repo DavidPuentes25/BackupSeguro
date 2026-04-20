@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Crear Backup</title>
+
+<style>
+body{
+    font-family:Arial;
+    background:#f4f6f7;
+    margin:40px;
+}
+
+h1{
+    color:#2c3e50;
+}
+
+form{
+    background:white;
+    padding:30px;
+    width:350px;
+    border-radius:10px;
+    box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
+select,button{
+    width:100%;
+    padding:10px;
+    margin:10px 0;
+}
+
+button{
+    background:#2c3e50;
+    color:white;
+    border:none;
+    border-radius:5px;
+}
+
+a{
+    text-decoration:none;
+    color:#2c3e50;
+    font-weight:bold;
+}
+</style>
+
+</head>
+<body>
+
+<h1>Crear Nuevo Backup</h1>
+
+<form method="POST">
+
+<select name="area" required>
+<option value="">Seleccione Área</option>
+<option value="Academico">Académico</option>
+<option value="Financiero">Financiero</option>
+<option value="Investigacion">Investigación</option>
+<option value="RRHH">RRHH</option>
+</select>
+
+<select name="tipo" required>
+<option value="">Seleccione Tipo</option>
+<option value="FULL">Full</option>
+<option value="INCREMENTAL">Incremental</option>
+<option value="DIFERENCIAL">Diferencial</option>
+</select>
+
+<button type="submit">Crear Backup</button>
+
+</form>
+
+<br>
+<a href="/dashboard">Volver al Dashboard</a>
+
+</body>
+</html>

@@ -3,6 +3,7 @@ import pyotp
 import qrcode
 import os
 import sqlite3
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = "clave_secreta_backup"
@@ -161,7 +162,7 @@ def logout():
     session.clear()
     return redirect(url_for("login"))
 
-@app.route("/crear_backup")
+@app.route("/crear_backup", methods=["GET", "POST"])
 def crear_backup():
 
     if "usuario" not in session:
@@ -170,21 +171,31 @@ def crear_backup():
     if session["rol"] not in ["admin", "operador"]:
         return "Acceso denegado"
 
-    conexion = sqlite3.connect("database.db")
-    cursor = conexion.cursor()
+    if request.method == "POST":
 
-    cursor.execute("""
-        INSERT INTO backups (nombre, fecha, estado)
-        VALUES ('Backup_Nuevo.zip', date('now'), 'Correcto')
-    """)
+        area = request.form["area"]
+        tipo = request.form["tipo"]
 
-    conexion.commit()
-    conexion.close()
+        fecha = datetime.now().strftime("%Y-%m-%d")
 
-    registrar_log(session["usuario"], "Backup creado")
+        nombre = f"Backup_{area}_{tipo}_{fecha}.zip"
 
-    return redirect(url_for("dashboard"))
+        conexion = sqlite3.connect("database.db")
+        cursor = conexion.cursor()
 
+        cursor.execute("""
+            INSERT INTO backups (nombre, fecha, estado)
+            VALUES (?, ?, ?)
+        """, (nombre, fecha, "Correcto"))
+
+        conexion.commit()
+        conexion.close()
+
+        registrar_log(session["usuario"], f"Creó backup {nombre}")
+
+        return redirect(url_for("dashboard"))
+
+    return render_template("crear_backup.html")
 
 @app.route("/eliminar_backup/<int:id>")
 def eliminar_backup(id):
