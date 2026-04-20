@@ -167,6 +167,9 @@ def crear_backup():
     if "usuario" not in session:
         return redirect(url_for("login"))
 
+    if session["rol"] not in ["admin", "operador"]:
+        return "Acceso denegado"
+
     conexion = sqlite3.connect("database.db")
     cursor = conexion.cursor()
 
@@ -189,6 +192,9 @@ def eliminar_backup(id):
     if "usuario" not in session:
         return redirect(url_for("login"))
 
+    if session["rol"] != "admin":
+        return "Acceso denegado"
+
     conexion = sqlite3.connect("database.db")
     cursor = conexion.cursor()
 
@@ -201,11 +207,15 @@ def eliminar_backup(id):
 
     return redirect(url_for("dashboard"))
 
+
 @app.route("/nuevo_usuario", methods=["GET", "POST"])
 def nuevo_usuario():
 
     if "usuario" not in session:
         return redirect(url_for("login"))
+
+    if session["rol"] != "admin":
+        return "Acceso denegado"
 
     mensaje = ""
 
@@ -213,14 +223,15 @@ def nuevo_usuario():
 
         usuario_nuevo = request.form["usuario"]
         password_nuevo = request.form["password"]
+        rol_nuevo = request.form["rol"]
 
         try:
             conexion = sqlite3.connect("database.db")
             cursor = conexion.cursor()
 
             cursor.execute(
-                "INSERT INTO usuarios (usuario, password) VALUES (?, ?)",
-                (usuario_nuevo, password_nuevo)
+                "INSERT INTO usuarios (usuario, password, rol) VALUES (?, ?, ?)",
+                (usuario_nuevo, password_nuevo, rol_nuevo)
             )
 
             conexion.commit()

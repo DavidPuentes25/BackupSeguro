@@ -11,22 +11,43 @@ body{
     margin:40px;
 }
 
+h1{
+    color:#2c3e50;
+}
+
 form{
     background:white;
     padding:30px;
-    width:300px;
+    width:350px;
     border-radius:10px;
+    box-shadow:0 0 10px rgba(0,0,0,0.1);
 }
 
-input{
+input,select{
     width:100%;
     padding:10px;
     margin:10px 0;
+    border:1px solid #ccc;
+    border-radius:5px;
 }
 
-button,a{
+button{
+    background:#2c3e50;
+    color:white;
+    border:none;
     padding:10px 20px;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+a{
     text-decoration:none;
+    color:#2c3e50;
+    font-weight:bold;
+}
+
+p{
+    margin-top:15px;
 }
 </style>
 
@@ -38,16 +59,25 @@ button,a{
 <form method="POST">
 
 <input type="text" name="usuario" placeholder="Usuario" required>
+
 <input type="password" name="password" placeholder="Contraseña" required>
 
-<button type="submit">Crear</button>
+<select name="rol" required>
+    <option value="">Seleccione Rol</option>
+    <option value="operador">Operador</option>
+    <option value="soporte">Soporte</option>
+    <option value="auditor">Auditor</option>
+    <option value="admin">Administrador</option>
+</select>
+
+<button type="submit">Crear Usuario</button>
 
 </form>
 
 <p>{{mensaje}}</p>
 
 <br>
-<a href="/dashboard">Volver</a>
+<a href="/dashboard">Volver al Dashboard</a>
 
 </body>
 </html>
