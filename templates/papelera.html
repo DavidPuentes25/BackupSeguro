@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Papelera de Backups</title>
+
+<style>
+body{
+    font-family:Arial;
+    background:#f4f6f7;
+    margin:40px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+}
+
+th,td{
+    padding:12px;
+    border:1px solid #ddd;
+    text-align:center;
+}
+
+th{
+    background:#2c3e50;
+    color:white;
+}
+
+a{
+    text-decoration:none;
+    padding:10px 20px;
+    background:#3498db;
+    color:white;
+    border-radius:5px;
+    margin:5px;
+    display:inline-block;
+}
+</style>
+
+</head>
+<body>
+
+<h1>Papelera de Backups</h1>
+
+<table>
+<tr>
+    <th>Archivo</th>
+    <th>Acción</th>
+</tr>
+
+{% for archivo in archivos %}
+<tr>
+    <td>{{archivo}}</td>
+    <td>
+        <a href="/restaurar_backup/{{archivo}}">Restaurar</a>
+    </td>
+</tr>
+{% endfor %}
+
+</table>
+
+<br>
+
+<a href="/dashboard">Volver</a>
+
+</body>
+</html>

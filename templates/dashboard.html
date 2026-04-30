@@ -115,6 +115,10 @@ a{
 <a href="/nuevo_usuario">Nuevo Usuario</a>
 {% endif %}
 
+{% if rol|trim|lower == "admin" %}
+<a href="/papelera">Papelera</a>
+{% endif %}
+
 <a href="/logout">Cerrar Sesión</a>
 
 </body>

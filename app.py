@@ -4,6 +4,7 @@ import qrcode
 import os
 import sqlite3
 import zipfile
+import shutil
 from datetime import datetime
 from flask import send_from_directory
 
@@ -240,12 +241,31 @@ def eliminar_backup(id):
     conexion = sqlite3.connect("database.db")
     cursor = conexion.cursor()
 
-    cursor.execute("DELETE FROM backups WHERE id=?", (id,))
+    cursor.execute("SELECT nombre FROM backups WHERE id=?", (id,))
+    backup = cursor.fetchone()
 
-    conexion.commit()
+    if backup:
+
+        nombre_archivo = backup[0]
+
+        if not os.path.exists("papelera"):
+            os.mkdir("papelera")
+
+        ruta_original = os.path.join("backups", nombre_archivo)
+        ruta_nueva = os.path.join("papelera", nombre_archivo)
+
+        if os.path.exists(ruta_original):
+            shutil.move(ruta_original, ruta_nueva)
+
+        cursor.execute("DELETE FROM backups WHERE id=?", (id,))
+        conexion.commit()
+
+        registrar_log(
+            session["usuario"],
+            f"Movió backup a papelera: {nombre_archivo}"
+        )
+
     conexion.close()
-
-    registrar_log(session["usuario"], f"Backup eliminado ID {id}")
 
     return redirect(url_for("dashboard"))
 
@@ -299,6 +319,54 @@ def nuevo_usuario():
 
     return render_template("nuevo_usuario.html", mensaje=mensaje)
 
+@app.route("/papelera")
+def papelera():
+
+    if "usuario" not in session:
+        return redirect(url_for("login"))
+
+    if session["rol"] != "admin":
+        return "Acceso denegado"
+
+    archivos = []
+
+    if os.path.exists("papelera"):
+        archivos = os.listdir("papelera")
+
+    return render_template("papelera.html", archivos=archivos)
+
+@app.route("/restaurar_backup/<nombre>")
+def restaurar_backup(nombre):
+
+    if "usuario" not in session:
+        return redirect(url_for("login"))
+
+    if session["rol"] != "admin":
+        return "Acceso denegado"
+
+    ruta_origen = f"papelera/{nombre}"
+    ruta_destino = f"backups/{nombre}"
+
+    if os.path.exists(ruta_origen):
+
+        shutil.move(ruta_origen, ruta_destino)
+
+        fecha = datetime.now().strftime("%Y-%m-%d")
+
+        conexion = sqlite3.connect("database.db")
+        cursor = conexion.cursor()
+
+        cursor.execute("""
+            INSERT INTO backups (nombre, fecha, estado)
+            VALUES (?, ?, ?)
+        """, (nombre, fecha, "Restaurado"))
+
+        conexion.commit()
+        conexion.close()
+
+        registrar_log(session["usuario"], f"Restauró backup {nombre}")
+
+    return redirect(url_for("dashboard"))
 if __name__ == "__main__":
     print("Servidor iniciando...")
     app.run(debug=True, host="127.0.0.1", port=5000)
