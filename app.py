@@ -3,7 +3,9 @@ import pyotp
 import qrcode
 import os
 import sqlite3
+import zipfile
 from datetime import datetime
+from flask import send_from_directory
 
 app = Flask(__name__)
 app.secret_key = "clave_secreta_backup"
@@ -177,9 +179,38 @@ def crear_backup():
         tipo = request.form["tipo"]
 
         fecha = datetime.now().strftime("%Y-%m-%d")
-
         nombre = f"Backup_{area}_{tipo}_{fecha}.zip"
 
+        # Crear carpeta backups si no existe
+        if not os.path.exists("backups"):
+            os.mkdir("backups")
+
+        # Rutas exactas
+        if area == "Academico":
+            ruta_origen = "datos/academico"
+        elif area == "Financiero":
+            ruta_origen = "datos/financiero"
+        elif area == "RRHH":
+            ruta_origen = "datos/rrhh"
+        else:
+            ruta_origen = "datos/investigacion"
+
+        ruta_destino = f"backups/{nombre}"
+
+        # Crear ZIP real
+        with zipfile.ZipFile(ruta_destino, "w") as zipf:
+
+            for carpeta, subcarpetas, archivos in os.walk(ruta_origen):
+                for archivo in archivos:
+                    ruta_archivo = os.path.join(carpeta, archivo)
+                    zipf.write(ruta_archivo, arcname=archivo)
+
+            # Agregar base de datos académica
+            if area.lower() == "academico":
+                if os.path.exists("academico.db"):
+                    zipf.write("academico.db", arcname="academico.db")
+
+        # Guardar en BD
         conexion = sqlite3.connect("database.db")
         cursor = conexion.cursor()
 
@@ -191,7 +222,7 @@ def crear_backup():
         conexion.commit()
         conexion.close()
 
-        registrar_log(session["usuario"], f"Creó backup {nombre}")
+        registrar_log(session["usuario"], f"Creó backup real {nombre}")
 
         return redirect(url_for("dashboard"))
 
@@ -218,6 +249,17 @@ def eliminar_backup(id):
 
     return redirect(url_for("dashboard"))
 
+@app.route("/descargar_backup/<nombre>")
+def descargar_backup(nombre):
+
+    if "usuario" not in session:
+        return redirect(url_for("login"))
+
+    return send_from_directory(
+        "backups",
+        nombre,
+        as_attachment=True
+    )
 
 @app.route("/nuevo_usuario", methods=["GET", "POST"])
 def nuevo_usuario():

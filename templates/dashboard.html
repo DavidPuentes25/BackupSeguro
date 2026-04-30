@@ -78,10 +78,10 @@ a{
     <td>{{backup.estado}}</td>
     <td>
 
+        <a href="/descargar_backup/{{backup.nombre}}">Descargar</a>
+
         {% if rol|trim|lower == "admin" %}
         <a href="/eliminar_backup/{{backup.id}}">Eliminar</a>
-        {% else %}
-        Sin permiso
         {% endif %}
 
     </td>
