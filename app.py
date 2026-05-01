@@ -114,16 +114,24 @@ def dashboard():
     if "usuario" not in session:
         return redirect(url_for("login"))
 
+    buscar = request.args.get("buscar", "")
+
     conexion = sqlite3.connect("database.db")
     cursor = conexion.cursor()
 
-    # Obtener backups
-    cursor.execute("""
-        SELECT id, nombre, fecha, estado
-        FROM backups
-        ORDER BY id DESC
-        LIMIT 10
-    """)
+    if buscar == "":
+        cursor.execute("""
+            SELECT id, nombre, fecha, estado
+            FROM backups
+            ORDER BY id DESC
+        """)
+    else:
+        cursor.execute("""
+            SELECT id, nombre, fecha, estado
+            FROM backups
+            WHERE nombre LIKE ?
+            ORDER BY id DESC
+        """, ('%' + buscar + '%',))
 
     datos_backups = cursor.fetchall()
 
@@ -137,7 +145,6 @@ def dashboard():
             "estado": fila[3]
         })
 
-    # Obtener logs
     cursor.execute("""
         SELECT usuario, evento, fecha
         FROM logs
@@ -154,7 +161,8 @@ def dashboard():
         usuario=session["usuario"],
         rol=session["rol"],
         backups=backups,
-        logs=logs
+        logs=logs,
+        buscar=buscar
     )
 
 @app.route("/logout")
@@ -186,7 +194,7 @@ def crear_backup():
         if not os.path.exists("backups"):
             os.mkdir("backups")
 
-        # Rutas exactas
+        # Definir carpeta origen según área
         if area == "Academico":
             ruta_origen = "datos/academico"
         elif area == "Financiero":
@@ -198,20 +206,33 @@ def crear_backup():
 
         ruta_destino = f"backups/{nombre}"
 
-        # Crear ZIP real
+        # Crear archivo ZIP
         with zipfile.ZipFile(ruta_destino, "w") as zipf:
 
+            # Agregar archivos de la carpeta
             for carpeta, subcarpetas, archivos in os.walk(ruta_origen):
                 for archivo in archivos:
                     ruta_archivo = os.path.join(carpeta, archivo)
                     zipf.write(ruta_archivo, arcname=archivo)
 
-            # Agregar base de datos académica
+            # Agregar base de datos según área
             if area.lower() == "academico":
                 if os.path.exists("academico.db"):
                     zipf.write("academico.db", arcname="academico.db")
 
-        # Guardar en BD
+            elif area.lower() == "financiero":
+                if os.path.exists("financiero.db"):
+                    zipf.write("financiero.db", arcname="financiero.db")
+
+            elif area.lower() == "rrhh":
+                if os.path.exists("rrhh.db"):
+                    zipf.write("rrhh.db", arcname="rrhh.db")
+
+            elif area.lower() == "investigacion":
+                if os.path.exists("investigacion.db"):
+                    zipf.write("investigacion.db", arcname="investigacion.db")
+
+        # Guardar registro en base de datos
         conexion = sqlite3.connect("database.db")
         cursor = conexion.cursor()
 
@@ -235,7 +256,7 @@ def eliminar_backup(id):
     if "usuario" not in session:
         return redirect(url_for("login"))
 
-    if session["rol"] != "admin":
+    if session["rol"] not in ["admin", "operador"]:
         return "Acceso denegado"
 
     conexion = sqlite3.connect("database.db")
@@ -325,7 +346,7 @@ def papelera():
     if "usuario" not in session:
         return redirect(url_for("login"))
 
-    if session["rol"] != "admin":
+    if session["rol"] not in ["admin", "operador"]:
         return "Acceso denegado"
 
     archivos = []

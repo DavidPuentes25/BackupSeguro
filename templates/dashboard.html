@@ -63,6 +63,22 @@ a{
 
 <h2>Backups Registrados</h2>
 
+<form method="GET" action="/dashboard">
+
+<input type="text"
+name="buscar"
+placeholder="Buscar backup..."
+value="{{buscar}}"
+style="padding:10px; width:300px;">
+
+<button type="submit">Buscar</button>
+
+<a href="/dashboard">Limpiar</a>
+
+</form>
+
+<br>
+
 <table>
 <tr>
     <th>Nombre Backup</th>
@@ -80,7 +96,7 @@ a{
 
         <a href="/descargar_backup/{{backup.nombre}}">Descargar</a>
 
-        {% if rol|trim|lower == "admin" %}
+        {% if rol|trim|lower == "admin" or rol|trim|lower == "operador" %}
         <a href="/eliminar_backup/{{backup.id}}">Eliminar</a>
         {% endif %}
 
