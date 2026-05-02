@@ -55,6 +55,13 @@ a{
     <td>{{archivo}}</td>
     <td>
         <a href="/restaurar_backup/{{archivo}}">Restaurar</a>
+
+        <a href="/eliminar_definitivo/{{archivo}}"
+        onclick="return confirm('¿Eliminar definitivamente este backup?')">
+        Eliminar Definitivo
+        </a>
+
+
     </td>
 </tr>
 {% endfor %}

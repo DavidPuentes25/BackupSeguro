@@ -3,40 +3,101 @@
 <head>
 <meta charset="UTF-8">
 <title>Verificación 2FA</title>
+
 <style>
+
 body{
+    margin:0;
     font-family:Arial;
+    background:#34495e;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+/* TARJETA */
+.card{
+    background:white;
+    padding:40px;
+    border-radius:10px;
+    width:350px;
     text-align:center;
-    margin-top:50px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.3);
 }
-img{
-    width:250px;
+
+/* LOGO */
+.logo img{
+    width:70px;
+    margin-bottom:10px;
 }
+
+/* QR */
+.qr img{
+    width:200px;
+    margin:15px 0;
+}
+
+/* INPUT */
 input{
+    width:100%;
     padding:10px;
-    margin:10px;
+    margin-top:10px;
+    border:1px solid #ccc;
+    border-radius:5px;
 }
+
+/* BOTÓN */
 button{
-    padding:10px 20px;
+    width:100%;
+    padding:10px;
+    background:#2ecc71;
+    color:white;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+    margin-top:10px;
 }
-p{
+
+button:hover{
+    background:#27ae60;
+}
+
+/* MENSAJE */
+.error{
     color:red;
+    margin-top:10px;
 }
+
 </style>
+
 </head>
 <body>
 
-<h2>Autenticación de Doble Factor</h2>
+<div class="card">
 
-<p>Escanea este código QR con Google Authenticator</p>
+<div class="logo">
+    <img src="{{ url_for('static', filename='logoucc.png') }}">
+    <h3>Verificación de Seguridad</h3>
+</div>
 
-<img src="{{ url_for('static', filename='qr.png') }}">
+<p>Escanea el código QR con Google Authenticator</p>
+
+<div class="qr">
+    <img src="{{ url_for('static', filename='qr.png') }}">
+</div>
 
 <form method="POST">
-    <input type="text" name="codigo" placeholder="Código de 6 dígitos" required><br>
+
+    <input type="text" name="codigo" placeholder="Código de 6 dígitos" required>
+
     <button type="submit">Verificar</button>
-    <p>{{mensaje}}</p>
+
 </form>
+
+<p class="error">{{mensaje}}</p>
+
+</div>
 
 </body>
 </html>

@@ -388,6 +388,72 @@ def restaurar_backup(nombre):
         registrar_log(session["usuario"], f"Restauró backup {nombre}")
 
     return redirect(url_for("dashboard"))
+
+@app.route("/eliminar_definitivo/<nombre>")
+def eliminar_definitivo(nombre):
+
+    if "usuario" not in session:
+        return redirect(url_for("login"))
+
+    if session["rol"] != "admin":
+        return "Acceso denegado"
+
+    ruta_archivo = f"papelera/{nombre}"
+
+    if os.path.exists(ruta_archivo):
+        os.remove(ruta_archivo)
+
+        registrar_log(
+            session["usuario"],
+            f"Eliminó definitivamente backup {nombre}"
+        )
+
+    return redirect(url_for("papelera"))
+
+@app.route("/cambiar_password", methods=["GET", "POST"])
+def cambiar_password():
+
+    if "usuario" not in session:
+        return redirect(url_for("login"))
+
+    mensaje = ""
+
+    if request.method == "POST":
+
+        actual = request.form["actual"]
+        nueva = request.form["nueva"]
+
+        conexion = sqlite3.connect("database.db")
+        cursor = conexion.cursor()
+
+        # Verificar contraseña actual
+        cursor.execute(
+            "SELECT password FROM usuarios WHERE usuario=?",
+            (session["usuario"],)
+        )
+
+        resultado = cursor.fetchone()
+
+        if resultado and resultado[0] == actual:
+
+            cursor.execute(
+                "UPDATE usuarios SET password=? WHERE usuario=?",
+                (nueva, session["usuario"])
+            )
+
+            conexion.commit()
+
+            registrar_log(session["usuario"], "Cambió su contraseña")
+
+            mensaje = "Contraseña actualizada correctamente"
+
+        else:
+            mensaje = "Contraseña actual incorrecta"
+
+        conexion.close()
+
+    return render_template("cambiar_password.html", mensaje=mensaje)
+
 if __name__ == "__main__":
     print("Servidor iniciando...")
     app.run(debug=True, host="127.0.0.1", port=5000)

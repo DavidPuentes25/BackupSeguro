@@ -5,64 +5,153 @@
 <title>Panel de Backups</title>
 
 <style>
+
 body{
+    margin:0;
     font-family:Arial;
-    background:#f4f6f7;
-    margin:40px;
+    background:#f4f6f9;
 }
 
-h1,h2{
-    color:#2c3e50;
+/* HEADER */
+.header{
+    background:#2c3e50;
+    color:white;
+    padding:15px 30px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
 }
 
+.logo{
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+.logo img{
+    width:50px;
+}
+
+.user{
+    text-align:right;
+}
+
+/* CONTENIDO */
+.container{
+    padding:30px;
+}
+
+/* TARJETAS */
+.cards{
+    display:flex;
+    gap:20px;
+    margin-bottom:30px;
+}
+
+.card{
+    flex:1;
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    text-align:center;
+    box-shadow:0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* BUSCADOR */
+.search{
+    margin-bottom:20px;
+}
+
+/* TABLA */
 table{
     width:100%;
     border-collapse:collapse;
     background:white;
-    margin-bottom:30px;
-}
-
-th,td{
-    padding:12px;
-    border:1px solid #ddd;
-    text-align:center;
+    border-radius:10px;
+    overflow:hidden;
 }
 
 th{
-    background:#2c3e50;
+    background:#34495e;
     color:white;
+    padding:12px;
 }
 
-a{
-    text-decoration:none;
-    padding:10px 20px;
-    background:#e74c3c;
-    color:white;
+td{
+    padding:12px;
+    border-bottom:1px solid #ddd;
+    text-align:center;
+}
+
+/* BOTONES */
+.btn{
+    padding:8px 15px;
     border-radius:5px;
-    display:inline-block;
-    margin:5px;
+    color:white;
+    text-decoration:none;
+    font-size:14px;
 }
 
-.info{
-    background:white;
-    padding:15px;
-    border-radius:8px;
-    margin-bottom:20px;
+.btn-danger{ background:#e74c3c; }
+.btn-primary{ background:#3498db; }
+.btn-success{ background:#2ecc71; }
+.btn-warning{ background:#f39c12; }
+
+/* ACCIONES */
+.actions{
+    margin-top:25px;
 }
+
+.actions a{
+    margin-right:10px;
+}
+
 </style>
-
 </head>
+
 <body>
 
-<h1>Bienvenido {{usuario}}</h1>
+<!-- HEADER -->
+<div class="header">
 
-<div class="info">
-<p><strong>Rol actual:</strong> [{{rol}}]</p>
-<p>Sistema Seguro de Backups Institucional</p>
+    <div class="logo">
+        <img src="{{ url_for('static', filename='logoucc.png') }}">
+        <div>
+            <strong>Universidad Cooperativa de Colombia</strong><br>
+            Sistema de Backups
+        </div>
+    </div>
+
+    <div class="user">
+        <strong>{{usuario}}</strong><br>
+        Rol: {{rol}}
+    </div>
+
 </div>
 
-<h2>Backups Registrados</h2>
+<!-- CONTENIDO -->
+<div class="container">
 
+<!-- TARJETAS -->
+<div class="cards">
+    <div class="card">
+        <h2>{{backups|length}}</h2>
+        <p>Total Backups</p>
+    </div>
+
+    <div class="card">
+        <h2>{{logs|length}}</h2>
+        <p>Eventos recientes</p>
+    </div>
+
+    <div class="card">
+        <h2>Activo</h2>
+        <p>Estado del sistema</p>
+    </div>
+</div>
+
+<!-- BUSCADOR -->
+<div class="search">
 <form method="GET" action="/dashboard">
 
 <input type="text"
@@ -71,20 +160,22 @@ placeholder="Buscar backup..."
 value="{{buscar}}"
 style="padding:10px; width:300px;">
 
-<button type="submit">Buscar</button>
+<button class="btn btn-primary" type="submit">Buscar</button>
 
-<a href="/dashboard">Limpiar</a>
+<a class="btn btn-warning" href="/dashboard">Limpiar</a>
 
 </form>
+</div>
 
-<br>
+<!-- TABLA BACKUPS -->
+<h2>Backups Registrados</h2>
 
 <table>
 <tr>
-    <th>Nombre Backup</th>
+    <th>Nombre</th>
     <th>Fecha</th>
     <th>Estado</th>
-    <th>Acción</th>
+    <th>Acciones</th>
 </tr>
 
 {% for backup in backups %}
@@ -94,10 +185,14 @@ style="padding:10px; width:300px;">
     <td>{{backup.estado}}</td>
     <td>
 
-        <a href="/descargar_backup/{{backup.nombre}}">Descargar</a>
+        <a class="btn btn-primary" href="/descargar_backup/{{backup.nombre}}">
+            Descargar
+        </a>
 
-        {% if rol|trim|lower == "admin" or rol|trim|lower == "operador" %}
-        <a href="/eliminar_backup/{{backup.id}}">Eliminar</a>
+        {% if rol|trim|lower in ["admin","operador"] %}
+        <a class="btn btn-danger" href="/eliminar_backup/{{backup.id}}">
+            Enviar a papelera
+        </a>
         {% endif %}
 
     </td>
@@ -105,6 +200,7 @@ style="padding:10px; width:300px;">
 {% endfor %}
 </table>
 
+<!-- LOGS -->
 <h2>Logs de Seguridad</h2>
 
 <table>
@@ -123,19 +219,25 @@ style="padding:10px; width:300px;">
 {% endfor %}
 </table>
 
-{% if rol|trim|lower == "admin" or rol|trim|lower == "operador" %}
-<a href="/crear_backup">Crear Backup</a>
+<!-- ACCIONES -->
+<div class="actions">
+
+{% if rol|trim|lower in ["admin","operador"] %}
+<a class="btn btn-success" href="/crear_backup">Crear Backup</a>
 {% endif %}
 
 {% if rol|trim|lower == "admin" %}
-<a href="/nuevo_usuario">Nuevo Usuario</a>
+<a class="btn btn-warning" href="/papelera">Papelera</a>
+<a class="btn btn-primary" href="/nuevo_usuario">Nuevo Usuario</a>
 {% endif %}
 
-{% if rol|trim|lower == "admin" %}
-<a href="/papelera">Papelera</a>
-{% endif %}
+<a class="btn btn-primary" href="/cambiar_password">Cambiar Contraseña</a>
 
-<a href="/logout">Cerrar Sesión</a>
+<a class="btn btn-danger" href="/logout">Cerrar Sesión</a>
+
+</div>
+
+</div>
 
 </body>
 </html>
